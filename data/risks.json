@@ -1,26 +1,50 @@
 {
-  "lastUpdated": "12 Feb 2026 17:00 AWST",
+  "lastUpdated": "2026-02-12 15:31 AWST",
   "items": [
     {
-      "id": "R-001",
-      "description": "Delivery delay of structural steel",
+      "id": "1",
+      "description": "BCV420 Drive Pulley Fabrication",
+      "status": "On Track",
       "rating": "Amber",
       "ownerRole": "Project Engineer",
-      "nextActionDate": "2026-02-18"
+      "nextActionDate": "2026-03-01",
+      "lastUpdatedRow": "2026-02-12"
     },
     {
-      "id": "R-002",
-      "description": "Vendor resource availability",
-      "rating": "Red",
-      "ownerRole": "Construction Lead",
-      "nextActionDate": "2026-02-15"
+      "id": "2",
+      "description": "",
+      "status": "",
+      "rating": "",
+      "ownerRole": "",
+      "nextActionDate": "",
+      "lastUpdatedRow": ""
     },
     {
-      "id": "R-003",
-      "description": "Power outage during tie-in",
-      "rating": "Green",
-      "ownerRole": "Electrical Lead",
-      "nextActionDate": "2026-02-20"
+      "id": "3",
+      "description": "",
+      "status": "",
+      "rating": "",
+      "ownerRole": "",
+      "nextActionDate": "",
+      "lastUpdatedRow": ""
+    },
+    {
+      "id": "4",
+      "description": "",
+      "status": "",
+      "rating": "",
+      "ownerRole": "",
+      "nextActionDate": "",
+      "lastUpdatedRow": ""
+    },
+    {
+      "id": "5",
+      "description": "",
+      "status": "",
+      "rating": "",
+      "ownerRole": "",
+      "nextActionDate": "",
+      "lastUpdatedRow": ""
     }
   ]
 }
