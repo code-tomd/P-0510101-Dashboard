@@ -1,0 +1,26 @@
+{
+  "lastUpdated": "12 Feb 2026 17:00 AWST",
+  "items": [
+    {
+      "id": "R-001",
+      "description": "Delivery delay of structural steel",
+      "rating": "Amber",
+      "ownerRole": "Project Engineer",
+      "nextActionDate": "2026-02-18"
+    },
+    {
+      "id": "R-002",
+      "description": "Vendor resource availability",
+      "rating": "Red",
+      "ownerRole": "Construction Lead",
+      "nextActionDate": "2026-02-15"
+    },
+    {
+      "id": "R-003",
+      "description": "Power outage during tie-in",
+      "rating": "Green",
+      "ownerRole": "Electrical Lead",
+      "nextActionDate": "2026-02-20"
+    }
+  ]
+}
