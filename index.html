@@ -1,9 +1,9 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>P-0510101 Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
     body { font-family: system-ui, Arial, sans-serif; margin: 24px; background:#f7f9fc; }
@@ -11,18 +11,23 @@
     .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
     .card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
     .row { display:flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    .chip { display:inline-block; padding: 4px 10px; border-radius: 999px; border:1px solid #ddd; background:#fff; font-size: 14px; }
-    .chip.red { border-color:#ffb3b3; background:#fff5f5; }
-    .chip.amber { border-color:#ffd9a3; background:#fff8ed; }
-    .chip.green { border-color:#b9e6c6; background:#f2fff6; }
-    table { width:100%; border-collapse: collapse; }
-    th, td { text-align:left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
-    tr.overdue td { background: #fff5f5; }
-tr.duesoon td { background: #fff8ed; }
-    th { font-size: 13px; color:#444; }
-    td { font-size: 14px; }
     .muted { color:#666; font-size: 13px; }
     select, input { padding: 8px 10px; border-radius: 10px; border:1px solid #ddd; background:#fff; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { text-align:left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+    th { font-size: 13px; color:#444; }
+    td { font-size: 14px; }
+    .chip { display:inline-block; padding: 4px 10px; border-radius: 999px; border:1px solid #ddd; background:#fff; font-size: 13px; }
+    .chip.red { border-color:#ff6b6b; background:#fff5f5; }
+    .chip.amber { border-color:#ffb84d; background:#fff8ed; }
+    .chip.green { border-color:#66cc66; background:#f2fff2; }
+
+    tr.overdue td { background:#fff5f5; }
+    tr.duesoon td { background:#fff8ed; }
+
+    .sectionTitle { margin:0; }
+    .right { margin-left:auto; }
+    .smallgap { gap: 8px; }
   </style>
 </head>
 
@@ -30,12 +35,32 @@ tr.duesoon td { background: #fff8ed; }
   <h1>P-0510101 B4 Marra Mamba Fixed Plant Upgrades</h1>
 
   <div class="grid">
+    <!-- Top status / metadata -->
     <div class="card">
-      <div class="row">
-        <span class="muted"><strong>Last updated:</strong> <span id="lastUpdated">—</span></span>
-        <span class="muted">Data source: repo file <code>data/risks.json</code></span>
+      <div class="row" style="justify-content: space-between;">
+        <div class="muted" id="metaLine">
+          Last updated: <span id="lastUpdated">Loading…</span>
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          Data source: repo file <code>source/project_dashboard.xlsx</code>
+        </div>
       </div>
-      <div class="row" style="margin-top:12px;">
+    </div>
+
+    <!-- RISKS -->
+    <div class="card">
+      <div class="row" style="justify-content: space-between;">
+        <h2 class="sectionTitle">Risks</h2>
+        <span class="muted" id="riskCount"></span>
+      </div>
+
+      <div class="row smallgap" style="margin:10px 0 6px 0;">
+        <span class="chip" id="kpiTotal">Total: –</span>
+        <span class="chip red" id="kpiRed">Red: –</span>
+        <span class="chip amber" id="kpiAmber">Amber: –</span>
+        <span class="chip green" id="kpiGreen">Green: –</span>
+      </div>
+
+      <div class="row" style="margin:8px 0 12px 0;">
         <label class="muted">Filter rating:</label>
         <select id="ratingFilter">
           <option value="All">All</option>
@@ -45,21 +70,7 @@ tr.duesoon td { background: #fff8ed; }
         </select>
 
         <label class="muted">Search:</label>
-        <input id="searchBox" type="text" placeholder="ID or description..." />
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="row" style="justify-content: space-between;">
-        <h2 style="margin:0;">Risks</h2>
-        <span class="muted" id="count">—</span>
-      </div>
-      
-      <div class="row" style="margin:10px 0 6px 0;">
-        <span class="chip" id="kpiTotal">Total: —</span>
-        <span class="chip red" id="kpiRed">Red: —</span>
-        <span class="chip amber" id="kpiAmber">Amber: —</span>
-        <span class="chip green" id="kpiGreen">Green: —</span>
+        <input id="searchBox" type="text" placeholder="ID or description…" />
       </div>
 
       <table>
@@ -77,96 +88,254 @@ tr.duesoon td { background: #fff8ed; }
         </tbody>
       </table>
     </div>
+
+    <!-- TQs -->
+    <div class="card">
+      <div class="row" style="justify-content: space-between;">
+        <h2 class="sectionTitle">TQs</h2>
+        <span class="muted" id="tqCount"></span>
+      </div>
+
+      <div class="row smallgap" style="margin:10px 0 6px 0;">
+        <span class="chip" id="tqTotal">Total: –</span>
+        <span class="chip" id="tqOpen">Open: –</span>
+        <span class="chip" id="tqClosed">Closed: –</span>
+      </div>
+
+      <div class="row" style="margin:8px 0 12px 0;">
+        <label class="muted">Filter status:</label>
+        <select id="tqStatusFilter">
+          <option value="All">All</option>
+          <option value="Open">Open</option>
+          <option value="Closed">Closed</option>
+        </select>
+
+        <label class="muted">Search:</label>
+        <input id="tqSearchBox" type="text" placeholder="ID or title…" />
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:90px;">ID</th>
+            <th>Title</th>
+            <th style="width:140px;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="tqsBody">
+          <tr><td colspan="3" class="muted">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
   <script>
-    let allItems = [];
-
-    function ratingClass(r) {
-      const x = (r || "").toLowerCase();
-      if (x === "red") return "red";
-      if (x === "amber") return "amber";
-      if (x === "green") return "green";
-      return "";
+    // ---------- Helpers ----------
+    function escapeHtml(s) {
+      return (s ?? "").toString()
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function render() {
+    function normaliseRating(r) {
+      const v = (r || "").toString().trim();
+      if (!v) return "";
+      const low = v.toLowerCase();
+      if (low === "red") return "Red";
+      if (low === "amber") return "Amber";
+      if (low === "green") return "Green";
+      // tolerate "R/A/G"
+      if (low === "r") return "Red";
+      if (low === "a") return "Amber";
+      if (low === "g") return "Green";
+      return v;
+    }
+
+    function ratingChipClass(r) {
+      const v = normaliseRating(r);
+      if (v === "Red") return "chip red";
+      if (v === "Amber") return "chip amber";
+      if (v === "Green") return "chip green";
+      return "chip";
+    }
+
+    function normaliseStatus(s) {
+      const v = (s || "").toString().trim();
+      if (!v) return "";
+      const low = v.toLowerCase();
+      if (low === "open") return "Open";
+      if (low === "closed") return "Closed";
+      return v;
+    }
+
+    // Parse YYYY-MM-DD; returns Date or null
+    function parseIsoDate(d) {
+      const s = (d || "").toString().trim();
+      if (!s) return null;
+      // enforce YYYY-MM-DD
+      const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return null;
+      return new Date(`${s}T00:00:00`);
+    }
+
+    // ---------- State ----------
+    let risksJson = null;
+    let risksItems = [];
+    let tqsJson = null;
+    let tqsItems = [];
+
+    // ---------- Risks ----------
+    async function loadRisks() {
+      const res = await fetch("data/risks.json", { cache: "no-store" });
+      risksJson = await res.json();
+      risksItems = Array.isArray(risksJson.items) ? risksJson.items : [];
+
+      // Meta line (use risks lastUpdated as the "site last updated")
+      document.getElementById("lastUpdated").textContent = risksJson.lastUpdated || "–";
+
+      document.getElementById("ratingFilter").addEventListener("change", renderRisks);
+      document.getElementById("searchBox").addEventListener("input", renderRisks);
+
+      renderRisks();
+    }
+
+    function renderRisks() {
       const rating = document.getElementById("ratingFilter").value;
       const q = document.getElementById("searchBox").value.trim().toLowerCase();
 
-      const filtered = allItems.filter(item => {
-        const matchRating = (rating === "All") || ((item.rating || "") === rating);
-        const hay = `${item.id || ""} ${item.description || ""}`.toLowerCase();
+      const all = risksItems.map(x => ({
+        id: (x.id || "").toString(),
+        description: (x.description || "").toString(),
+        rating: normaliseRating(x.rating),
+        ownerRole: (x.ownerRole || "").toString(),
+        nextActionDate: (x.nextActionDate || "").toString()
+      }));
+
+      const filtered = all.filter(item => {
+        const matchRating = (rating === "All") || (item.rating === rating);
+        const hay = `${item.id} ${item.description}`.toLowerCase();
         const matchSearch = (q === "") || hay.includes(q);
         return matchRating && matchSearch;
       });
 
-      document.getElementById("count").textContent = `${filtered.length} shown`;
-      
-      // KPI calculations (based on all risks, not filtered)
-const total = allItems.length;
-const red = allItems.filter(i => (i.rating || "") === "Red").length;
-const amber = allItems.filter(i => (i.rating || "") === "Amber").length;
-const green = allItems.filter(i => (i.rating || "") === "Green").length;
+      // KPI from all risks, not filtered
+      const total = all.length;
+      const red = all.filter(i => i.rating === "Red").length;
+      const amber = all.filter(i => i.rating === "Amber").length;
+      const green = all.filter(i => i.rating === "Green").length;
 
-document.getElementById("kpiTotal").textContent = `Total: ${total}`;
-document.getElementById("kpiRed").textContent = `Red: ${red}`;
-document.getElementById("kpiAmber").textContent = `Amber: ${amber}`;
-document.getElementById("kpiGreen").textContent = `Green: ${green}`;
+      document.getElementById("kpiTotal").textContent = `Total: ${total}`;
+      document.getElementById("kpiRed").textContent = `Red: ${red}`;
+      document.getElementById("kpiAmber").textContent = `Amber: ${amber}`;
+      document.getElementById("kpiGreen").textContent = `Green: ${green}`;
+      document.getElementById("riskCount").textContent = `${filtered.length} shown`;
 
       const tbody = document.getElementById("risksBody");
-      tbody.innerHTML = "";
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="muted">No matching risks.</td></tr>`;
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="muted">No matches.</td></tr>`;
         return;
       }
 
-      for (const item of filtered) {
-        const tr = document.createElement("tr");
-        // Date highlighting logic
-if (item.nextActionDate) {
-  const today = new Date();
-  const due = new Date(item.nextActionDate + "T00:00:00");
+      const today = new Date();
+      tbody.innerHTML = filtered.map(item => {
+        // Date highlighting: overdue (<0 days), due soon (<=3 days)
+        let rowClass = "";
+        const due = parseIsoDate(item.nextActionDate);
+        if (due) {
+          const diffMs = due - today;
+          const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) rowClass = "overdue";
+          else if (diffDays <= 3) rowClass = "duesoon";
+        }
 
-  const diffMs = due - today;
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) {
-    tr.classList.add("overdue");
-  } else if (diffDays <= 3) {
-    tr.classList.add("duesoon");
-  }
-}
-        tr.innerHTML = `
-          <td><strong>${item.id || ""}</strong></td>
-          <td>${item.description || ""}</td>
-          <td><span class="chip ${ratingClass(item.rating)}">${item.rating || ""}</span></td>
-          <td>${item.ownerRole || ""}</td>
-          <td>${item.nextActionDate || ""}</td>
+        return `
+          <tr class="${rowClass}">
+            <td><strong>${escapeHtml(item.id)}</strong></td>
+            <td>${escapeHtml(item.description)}</td>
+            <td><span class="${ratingChipClass(item.rating)}">${escapeHtml(item.rating)}</span></td>
+            <td>${escapeHtml(item.ownerRole)}</td>
+            <td>${escapeHtml(item.nextActionDate)}</td>
+          </tr>
         `;
-        tbody.appendChild(tr);
+      }).join("");
+    }
+
+    // ---------- TQs ----------
+    async function loadTqs() {
+      const res = await fetch("data/tqs.json", { cache: "no-store" });
+      tqsJson = await res.json();
+      tqsItems = Array.isArray(tqsJson.items) ? tqsJson.items : [];
+
+      document.getElementById("tqStatusFilter").addEventListener("change", renderTqs);
+      document.getElementById("tqSearchBox").addEventListener("input", renderTqs);
+
+      renderTqs();
+    }
+
+    function renderTqs() {
+      const statusFilter = document.getElementById("tqStatusFilter").value;
+      const q = document.getElementById("tqSearchBox").value.trim().toLowerCase();
+
+      const all = tqsItems.map(x => ({
+        id: (x.id || "").toString(),
+        title: (x.title || "").toString(),
+        status: normaliseStatus(x.status)
+      }));
+
+      const filtered = all.filter(item => {
+        const matchStatus = (statusFilter === "All") || (item.status === statusFilter);
+        const hay = `${item.id} ${item.title}`.toLowerCase();
+        const matchSearch = (q === "") || hay.includes(q);
+        return matchStatus && matchSearch;
+      });
+
+      const total = all.length;
+      const open = all.filter(i => i.status === "Open").length;
+      const closed = all.filter(i => i.status === "Closed").length;
+
+      document.getElementById("tqTotal").textContent = `Total: ${total}`;
+      document.getElementById("tqOpen").textContent = `Open: ${open}`;
+      document.getElementById("tqClosed").textContent = `Closed: ${closed}`;
+      document.getElementById("tqCount").textContent = `${filtered.length} shown`;
+
+      const tbody = document.getElementById("tqsBody");
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="3" class="muted">No matches.</td></tr>`;
+        return;
       }
+
+      tbody.innerHTML = filtered.map(item => `
+        <tr>
+          <td><strong>${escapeHtml(item.id)}</strong></td>
+          <td>${escapeHtml(item.title)}</td>
+          <td>${escapeHtml(item.status)}</td>
+        </tr>
+      `).join("");
     }
 
-    async function load() {
-      const res = await fetch("./data/risks.json", { cache: "no-store" });
-      const data = await res.json();
+    // ---------- Init ----------
+    (async function init() {
+      try {
+        await loadRisks();
+      } catch (e) {
+        document.getElementById("lastUpdated").textContent = "Failed to load risks.json";
+        document.getElementById("risksBody").innerHTML =
+          `<tr><td colspan="5" class="muted">Error loading risks.json</td></tr>`;
+        console.error(e);
+      }
 
-      document.getElementById("lastUpdated").textContent = data.lastUpdated || "—";
-      allItems = data.items || [];
-
-      render();
-    }
-
-    document.getElementById("ratingFilter").addEventListener("change", render);
-    document.getElementById("searchBox").addEventListener("input", render);
-
-    load().catch(err => {
-      const tbody = document.getElementById("risksBody");
-      tbody.innerHTML = `<tr><td colspan="5" class="muted">Error loading risks.json — check the file exists and is valid JSON.</td></tr>`;
-      console.error(err);
-    });
+      try {
+        await loadTqs();
+      } catch (e) {
+        document.getElementById("tqsBody").innerHTML =
+          `<tr><td colspan="3" class="muted">Error loading tqs.json</td></tr>`;
+        console.error(e);
+      }
+    })();
   </script>
 </body>
 </html>
