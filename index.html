@@ -17,6 +17,8 @@
     .chip.green { border-color:#b9e6c6; background:#f2fff6; }
     table { width:100%; border-collapse: collapse; }
     th, td { text-align:left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+    tr.overdue td { background: #fff5f5; }
+tr.duesoon td { background: #fff8ed; }
     th { font-size: 13px; color:#444; }
     td { font-size: 14px; }
     .muted { color:#666; font-size: 13px; }
@@ -122,6 +124,20 @@ document.getElementById("kpiGreen").textContent = `Green: ${green}`;
 
       for (const item of filtered) {
         const tr = document.createElement("tr");
+        // Date highlighting logic
+if (item.nextActionDate) {
+  const today = new Date();
+  const due = new Date(item.nextActionDate + "T00:00:00");
+
+  const diffMs = due - today;
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) {
+    tr.classList.add("overdue");
+  } else if (diffDays <= 3) {
+    tr.classList.add("duesoon");
+  }
+}
         tr.innerHTML = `
           <td><strong>${item.id || ""}</strong></td>
           <td>${item.description || ""}</td>
