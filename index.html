@@ -1,42 +1,138 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>P-0510101 Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body {
-      font-family: system-ui, Arial, sans-serif;
-      margin: 40px;
-      background: #f7f9fc;
-    }
-
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-    }
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; background:#f7f9fc; }
+    h1 { margin: 0 0 14px 0; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+    .row { display:flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .chip { display:inline-block; padding: 4px 10px; border-radius: 999px; border:1px solid #ddd; background:#fff; font-size: 14px; }
+    .chip.red { border-color:#ffb3b3; background:#fff5f5; }
+    .chip.amber { border-color:#ffd9a3; background:#fff8ed; }
+    .chip.green { border-color:#b9e6c6; background:#f2fff6; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { text-align:left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+    th { font-size: 13px; color:#444; }
+    td { font-size: 14px; }
+    .muted { color:#666; font-size: 13px; }
+    select, input { padding: 8px 10px; border-radius: 10px; border:1px solid #ddd; background:#fff; }
   </style>
 </head>
 
 <body>
-
   <h1>P-0510101 B4 Marra Mamba Fixed Plant Upgrades</h1>
 
-  <div class="card">
-    <strong>Status:</strong> Dashboard setup in progress.
+  <div class="grid">
+    <div class="card">
+      <div class="row">
+        <span class="muted"><strong>Last updated:</strong> <span id="lastUpdated">—</span></span>
+        <span class="muted">Data source: repo file <code>data/risks.json</code></span>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <label class="muted">Filter rating:</label>
+        <select id="ratingFilter">
+          <option value="All">All</option>
+          <option value="Red">Red</option>
+          <option value="Amber">Amber</option>
+          <option value="Green">Green</option>
+        </select>
+
+        <label class="muted">Search:</label>
+        <input id="searchBox" type="text" placeholder="ID or description..." />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content: space-between;">
+        <h2 style="margin:0;">Risks</h2>
+        <span class="muted" id="count">—</span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:90px;">ID</th>
+            <th>Description</th>
+            <th style="width:110px;">Rating</th>
+            <th style="width:160px;">Owner role</th>
+            <th style="width:140px;">Next action</th>
+          </tr>
+        </thead>
+        <tbody id="risksBody">
+          <tr><td colspan="5" class="muted">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="card">
-    <strong>Last updated:</strong> Manual placeholder.
-  </div>
+  <script>
+    let allItems = [];
 
+    function ratingClass(r) {
+      const x = (r || "").toLowerCase();
+      if (x === "red") return "red";
+      if (x === "amber") return "amber";
+      if (x === "green") return "green";
+      return "";
+    }
+
+    function render() {
+      const rating = document.getElementById("ratingFilter").value;
+      const q = document.getElementById("searchBox").value.trim().toLowerCase();
+
+      const filtered = allItems.filter(item => {
+        const matchRating = (rating === "All") || ((item.rating || "") === rating);
+        const hay = `${item.id || ""} ${item.description || ""}`.toLowerCase();
+        const matchSearch = (q === "") || hay.includes(q);
+        return matchRating && matchSearch;
+      });
+
+      document.getElementById("count").textContent = `${filtered.length} shown`;
+
+      const tbody = document.getElementById("risksBody");
+      tbody.innerHTML = "";
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="muted">No matching risks.</td></tr>`;
+        return;
+      }
+
+      for (const item of filtered) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${item.id || ""}</strong></td>
+          <td>${item.description || ""}</td>
+          <td><span class="chip ${ratingClass(item.rating)}">${item.rating || ""}</span></td>
+          <td>${item.ownerRole || ""}</td>
+          <td>${item.nextActionDate || ""}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function load() {
+      const res = await fetch("./data/risks.json", { cache: "no-store" });
+      const data = await res.json();
+
+      document.getElementById("lastUpdated").textContent = data.lastUpdated || "—";
+      allItems = data.items || [];
+
+      render();
+    }
+
+    document.getElementById("ratingFilter").addEventListener("change", render);
+    document.getElementById("searchBox").addEventListener("input", render);
+
+    load().catch(err => {
+      const tbody = document.getElementById("risksBody");
+      tbody.innerHTML = `<tr><td colspan="5" class="muted">Error loading risks.json — check the file exists and is valid JSON.</td></tr>`;
+      console.error(err);
+    });
+  </script>
 </body>
 </html>
