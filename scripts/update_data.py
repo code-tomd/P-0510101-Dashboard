@@ -96,10 +96,10 @@ def main():
     # Clean rows: drop completely empty ones
     df = df.dropna(how="all")
 
-    items = []
+        items = []
     for _, row in df.iterrows():
-risk_id = as_text(row.get("risk_id")).strip()
-title = as_text(row.get("title")).strip()
+        risk_id = as_text(row.get("risk_id")).strip()
+        title = as_text(row.get("title")).strip()
 
         # Skip blank lines (common in Excel)
         if not risk_id and not title:
@@ -107,14 +107,16 @@ title = as_text(row.get("title")).strip()
 
         item = {
             "id": risk_id,
-            "description": title,  # dashboard uses "description" label; we map title -> description
-"status": as_text(row.get("status")).strip(),
+            "description": title,
+            "status": as_text(row.get("status")).strip(),
             "rating": normalise_rating(row.get("rating")),
-"ownerRole": as_text(row.get("owner_role")).strip(),
+            "ownerRole": as_text(row.get("owner_role")).strip(),
             "nextActionDate": to_iso_date(row.get("due_date")),
             "lastUpdatedRow": to_iso_date(row.get("last_updated")),
         }
+
         items.append(item)
+
 
     now_awst = datetime.now(ZoneInfo("Australia/Perth")).strftime("%Y-%m-%d %H:%M AWST")
     out = {"lastUpdated": now_awst, "items": items}
