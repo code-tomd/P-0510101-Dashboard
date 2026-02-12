@@ -52,6 +52,13 @@
         <h2 style="margin:0;">Risks</h2>
         <span class="muted" id="count">—</span>
       </div>
+      
+      <div class="row" style="margin:10px 0 6px 0;">
+        <span class="chip" id="kpiTotal">Total: —</span>
+        <span class="chip red" id="kpiRed">Red: —</span>
+        <span class="chip amber" id="kpiAmber">Amber: —</span>
+        <span class="chip green" id="kpiGreen">Green: —</span>
+      </div>
 
       <table>
         <thead>
@@ -93,6 +100,17 @@
       });
 
       document.getElementById("count").textContent = `${filtered.length} shown`;
+      
+      // KPI calculations (based on all risks, not filtered)
+const total = allItems.length;
+const red = allItems.filter(i => (i.rating || "") === "Red").length;
+const amber = allItems.filter(i => (i.rating || "") === "Amber").length;
+const green = allItems.filter(i => (i.rating || "") === "Green").length;
+
+document.getElementById("kpiTotal").textContent = `Total: ${total}`;
+document.getElementById("kpiRed").textContent = `Red: ${red}`;
+document.getElementById("kpiAmber").textContent = `Amber: ${amber}`;
+document.getElementById("kpiGreen").textContent = `Green: ${green}`;
 
       const tbody = document.getElementById("risksBody");
       tbody.innerHTML = "";
