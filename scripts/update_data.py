@@ -61,6 +61,17 @@ def to_iso_date(val) -> str:
     s = str(val).strip()
     return s
 
+def as_text(val) -> str:
+    """Safe string conversion for Excel cells (handles NaN/None/numbers)."""
+    if val is None:
+        return ""
+    # pandas uses NaN floats for blanks sometimes
+    try:
+        if pd.isna(val):
+            return ""
+    except Exception:
+        pass
+    return str(val)
 
 def main():
     if not SOURCE_XLSX.exists():
@@ -87,8 +98,8 @@ def main():
 
     items = []
     for _, row in df.iterrows():
-        risk_id = (row.get("risk_id") or "").strip()
-        title = (row.get("title") or "").strip()
+risk_id = as_text(row.get("risk_id")).strip()
+title = as_text(row.get("title")).strip()
 
         # Skip blank lines (common in Excel)
         if not risk_id and not title:
@@ -97,9 +108,9 @@ def main():
         item = {
             "id": risk_id,
             "description": title,  # dashboard uses "description" label; we map title -> description
-            "status": (row.get("status") or "").strip(),
+"status": as_text(row.get("status")).strip(),
             "rating": normalise_rating(row.get("rating")),
-            "ownerRole": (row.get("owner_role") or "").strip(),
+"ownerRole": as_text(row.get("owner_role")).strip(),
             "nextActionDate": to_iso_date(row.get("due_date")),
             "lastUpdatedRow": to_iso_date(row.get("last_updated")),
         }
